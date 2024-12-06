@@ -30,6 +30,8 @@ async function run() {
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
 
     const moviesCollection = client.db('moviesDB').collection('movies');
+    const usersCollection = client.db('moviesDB').collection('users');
+
 
     app.get('/movies', async (req, res) => {
       const cursor = moviesCollection.find();
@@ -56,8 +58,18 @@ async function run() {
       const result = await moviesCollection.deleteOne(query);
       res.send(result);
 
-
     })
+
+
+//------------------API for Users--------------------//
+
+app.post('/users', async(req,res)=>{
+  const newUser = req.body;
+  const result = await usersCollection.insertOne(newUser);
+  res.send(result);
+})
+
+
 
   } finally {
     // Ensures that the client will close when you finish/error
