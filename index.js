@@ -31,11 +31,16 @@ async function run() {
 
     const moviesCollection = client.db('moviesDB').collection('movies');
 
+app.get('/movies', async(req, res)=>{
+  const cursor = moviesCollection.find();
+  const result = await cursor.toArray();
+  res.send(result);
+})
+
     app.post('/movies', async(req, res)=>{
       const newMovies = req.body;
       const result = await moviesCollection.insertOne(newMovies);
-      // find().sort({ rating: -1})
-      console.log(result);
+      res.send(result);
     })
 
   
