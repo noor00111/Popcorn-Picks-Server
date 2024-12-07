@@ -32,13 +32,19 @@ async function run() {
     const moviesCollection = client.db('moviesDB').collection('movies');
     const usersCollection = client.db('moviesDB').collection('users');
 
-
     app.get('/movies', async (req, res) => {
       const cursor = moviesCollection.find();
       const result = await cursor.toArray();
       res.send(result);
     })
 
+    app.get('/movies/featured', async (req, res) => {
+      const {limit = 6, sort = "rating"} = req.query;
+      const cursor = moviesCollection.find();
+      const result =  await cursor.sort({ [sort]: -1}).limit(parseInt(limit)).toArray();
+      res.send(result);
+    })
+    
     app.get('/movies/:id', async(req, res)=>{
       const id = req.params.id;
       const query = {_id: new ObjectId(id)}
@@ -59,6 +65,8 @@ async function run() {
       res.send(result);
 
     })
+    
+
 
 
 //------------------API for Users--------------------//
