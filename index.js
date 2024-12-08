@@ -24,10 +24,10 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    // await client.connect();
     // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
-    console.log("Pinged your deployment. You successfully connected to MongoDB!");
+    // await client.db("admin").command({ ping: 1 });
+    // console.log("Pinged your deployment. You successfully connected to MongoDB!");
 
     const moviesCollection = client.db('moviesDB').collection('movies');
     const usersCollection = client.db('moviesDB').collection('users');
@@ -39,15 +39,15 @@ async function run() {
     })
 
     app.get('/movies/featured', async (req, res) => {
-      const {limit = 6, sort = "rating"} = req.query;
+      const { limit = 6, sort = "rating" } = req.query;
       const cursor = moviesCollection.find();
-      const result =  await cursor.sort({ [sort]: -1}).limit(parseInt(limit)).toArray();
+      const result = await cursor.sort({ [sort]: -1 }).limit(parseInt(limit)).toArray();
       res.send(result);
     })
-    
-    app.get('/movies/:id', async(req, res)=>{
+
+    app.get('/movies/:id', async (req, res) => {
       const id = req.params.id;
-      const query = {_id: new ObjectId(id)}
+      const query = { _id: new ObjectId(id) }
       const result = await moviesCollection.findOne(query);
       res.send(result);
     })
@@ -58,24 +58,45 @@ async function run() {
       res.send(result);
     })
 
-    app.delete('/movies/:id', async(req, res)=>{
+    app.put('/movies/:id', async (req, res) => {
       const id = req.params.id;
-      const query = {_id: new ObjectId(id)}
+      const filter = { _id: new ObjectId(id) }
+      const options = { upsert: true };
+      const updatedMovieData = req.body;
+      const movie = {
+        $set: {
+          poster: updatedMovieData.poster,
+          title: updatedMovieData.title,
+          genre: updatedMovieData.genre,
+          duration: updatedMovieData.duration,
+          year: updatedMovieData.year,
+          summary: updatedMovieData.summary
+        }
+      }
+      const result = await moviesCollection.updateOne(filter, movie, options);
+      res.send(result);
+    })
+
+    app.delete('/movies/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) }
       const result = await moviesCollection.deleteOne(query);
       res.send(result);
 
     })
-    
 
 
 
-//------------------API for Users--------------------//
 
-app.post('/users', async(req,res)=>{
-  const newUser = req.body;
-  const result = await usersCollection.insertOne(newUser);
-  res.send(result);
-})
+
+
+    //------------------API for Users--------------------//
+
+    app.post('/users', async (req, res) => {
+      const newUser = req.body;
+      const result = await usersCollection.insertOne(newUser);
+      res.send(result);
+    })
 
 
 
