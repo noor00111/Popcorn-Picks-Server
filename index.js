@@ -31,6 +31,9 @@ async function run() {
 
     const moviesCollection = client.db('moviesDB').collection('movies');
     const usersCollection = client.db('moviesDB').collection('users');
+    const favMoviesCollection = client.db('moviesDB').collection('favMovies');
+
+
 
     app.get('/movies', async (req, res) => {
       const cursor = moviesCollection.find();
@@ -87,9 +90,6 @@ async function run() {
 
 
 
-
-
-
     //------------------API for Users--------------------//
 
     app.post('/users', async (req, res) => {
@@ -97,6 +97,32 @@ async function run() {
       const result = await usersCollection.insertOne(newUser);
       res.send(result);
     })
+
+
+        //------------------API for favMovies--------------------//
+
+        app.post('/favMovies', async (req, res) => {
+          const newUser = req.body;
+          const result = await favMoviesCollection.insertOne(newUser);
+          res.send(result);
+        })
+
+        app.get('/favMovies', async (req, res) => {
+          const email = req.query.email;
+          const query = { email };
+          const cursor =  favMoviesCollection.find(query);
+          const result = await cursor.toArray();
+          res.send(result);
+        })
+
+        app.delete('/favMovies/:id', async (req, res) => {
+          // const id = req.params.id;
+          // const query = { _id: new ObjectId(id) }
+          // const result = await moviesCollection.deleteOne(query);
+          // res.send(result);
+        })
+
+
 
 
 
