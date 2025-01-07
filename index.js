@@ -34,20 +34,22 @@ async function run() {
     const favMoviesCollection = client.db('moviesDB').collection('favMovies');
 
 
-
+    //select * from moviesCollection
     app.get('/movies', async (req, res) => {
+      const { sort = "rating" } = req.query;
       const cursor = moviesCollection.find();
-      const result = await cursor.toArray();
+      const result = await cursor.sort({ [sort]: -1 }).toArray();
       res.send(result);
     })
 
     app.get('/movies/featured', async (req, res) => {
-      const { limit = 6, sort = "rating" } = req.query;
+      const { limit = 8} = req.query;
       const cursor = moviesCollection.find();
-      const result = await cursor.sort({ [sort]: -1 }).limit(parseInt(limit)).toArray();
+      const result = await cursor.limit(parseInt(limit)).toArray();
       res.send(result);
     })
 
+    //select * from moviesCollection where id = _id;
     app.get('/movies/:id', async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) }
@@ -73,6 +75,7 @@ async function run() {
           genre: updatedMovieData.genre,
           duration: updatedMovieData.duration,
           year: updatedMovieData.year,
+          rating: updatedMovieData.rating,
           summary: updatedMovieData.summary
         }
       }
